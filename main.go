@@ -1,6 +1,7 @@
 package main
 
 import (
+	"time"
 	"errors"
 	"fmt"
 )
@@ -13,6 +14,7 @@ func main() {
 		po := obj.(*PurchaseOrder)
 		fmt.Printf("Purchase Number Saved With iD: %d\n", po.Number)
 
+		time.Sleep(1 * time.Second)
 		return nil
 	}, func (err error)  {
 		fmt.Printf("Purchase Number Failed With Error: " + err.Error() + "\n")
@@ -62,6 +64,8 @@ func (this *Promise) Then(success func(interface{}) error, failure func(error)) 
 	result.successChannel = make(chan interface{}, 1)
 	result.failureChannel = make(chan error, 1)
 
+	timeout := time.After(1 * time.Second)
+
 	go func() {
 		select{
 		case obj :=  <- this.successChannel:
@@ -74,6 +78,8 @@ func (this *Promise) Then(success func(interface{}) error, failure func(error)) 
 		case err := <- this.failureChannel:
 			failure(err)
 			result.failureChannel <- err
+		case <- timeout:
+			failure(errors.New("Promise Timed Out"))
 		}
 	}()
 
