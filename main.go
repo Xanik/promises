@@ -16,6 +16,11 @@ func main() {
 		return nil
 	}, func (err error)  {
 		fmt.Printf("Purchase Number Failed With Error: " + err.Error() + "\n")
+	}).Then(func (obj interface{}) error {
+		fmt.Printf("Second Promise Success")
+		return nil
+	}, func (err error)  {
+		fmt.Printf("Second Promise Failed: " + err.Error() + "\n")
 	})
 
 	fmt.Scanln()
